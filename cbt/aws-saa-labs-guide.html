@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AWS SAA-C03 — 20 Hands-On Labs Guide</title>
+<style>
+  :root {
+    --aws-orange: #FF9900;
+    --aws-dark: #232F3E;
+    --aws-blue: #1A73E8;
+    --aws-light-blue: #E8F4FD;
+    --aws-green: #1E8A44;
+    --aws-light-green: #E8F5E9;
+    --aws-purple: #6B46C1;
+    --aws-light-purple: #F3EEFF;
+    --aws-red: #D32F2F;
+    --bg: #FAFAFA;
+    --card-bg: #FFFFFF;
+    --border: #E0E0E0;
+    --text: #1A1A1A;
+    --text-muted: #555;
+    --code-bg: #1E2A3A;
+    --code-text: #E8EFF7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, var(--aws-dark) 0%, #1B4F72 100%);
+    color: white;
+    padding: 60px 40px 50px;
+    text-align: center;
+  }
+  .hero h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.5px; }
+  .hero h1 span { color: var(--aws-orange); }
+  .hero p { margin-top: 12px; font-size: 1.1rem; opacity: 0.85; max-width: 650px; margin-left: auto; margin-right: auto; }
+  .badge-row { display: flex; justify-content: center; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+  .badge {
+    background: rgba(255,153,0,0.2);
+    border: 1px solid rgba(255,153,0,0.5);
+    color: var(--aws-orange);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  /* TOC */
+  .toc {
+    background: var(--card-bg);
+    border-left: 4px solid var(--aws-orange);
+    margin: 32px auto;
+    max-width: 900px;
+    padding: 24px 32px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .toc h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--aws-orange); margin-bottom: 14px; }
+  .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 32px; }
+  .toc a { color: var(--aws-blue); text-decoration: none; font-size: 0.9rem; display: block; padding: 3px 0; }
+  .toc a:hover { text-decoration: underline; }
+  .toc-domain { font-weight: 700; color: var(--text); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px; }
+
+  /* Main content */
+  main { max-width: 900px; margin: 0 auto; padding: 0 24px 60px; }
+
+  /* Domain banners */
+  .domain-banner {
+    border-radius: 10px;
+    padding: 22px 28px;
+    margin: 40px 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .domain-banner.secure   { background: linear-gradient(90deg, #1B4F72 0%, #2980B9 100%); }
+  .domain-banner.resilient { background: linear-gradient(90deg, #1E5631 0%, #27AE60 100%); }
+  .domain-banner.perform   { background: linear-gradient(90deg, #4A235A 0%, #8E44AD 100%); }
+  .domain-banner.cost      { background: linear-gradient(90deg, #784212 0%, #E67E22 100%); }
+  .domain-banner .icon { font-size: 2.2rem; }
+  .domain-banner h2 { color: white; font-size: 1.4rem; font-weight: 700; }
+  .domain-banner p  { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 2px; }
+
+  /* Lab cards */
+  .lab-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 28px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .lab-header {
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .lab-num {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+  .secure   .lab-num { background: #1B4F72; color: white; }
+  .resilient .lab-num { background: #1E5631; color: white; }
+  .perform  .lab-num { background: #4A235A; color: white; }
+  .cost     .lab-num { background: #784212; color: white; }
+
+  .lab-title-block { flex: 1; }
+  .lab-title-block h3 { font-size: 1.05rem; font-weight: 700; }
+  .lab-title-block .meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; }
+  .lab-title-block .meta .service-tag {
+    display: inline-block;
+    background: var(--aws-light-blue);
+    color: var(--aws-blue);
+    border-radius: 4px;
+    padding: 1px 8px;
+    margin-right: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .toggle-icon { font-size: 1.1rem; color: var(--text-muted); transition: transform 0.25s; flex-shrink: 0; }
+  .lab-card.open .toggle-icon { transform: rotate(180deg); }
+
+  .lab-body { display: none; padding: 0 24px 24px; border-top: 1px solid var(--border); }
+  .lab-card.open .lab-body { display: block; }
+
+  .objective-box {
+    background: var(--aws-light-blue);
+    border-left: 3px solid var(--aws-blue);
+    padding: 10px 16px;
+    border-radius: 0 6px 6px 0;
+    margin: 16px 0;
+    font-size: 0.9rem;
+    color: #1A3A5C;
+  }
+
+  .lab-body h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin: 20px 0 10px; font-weight: 700; }
+
+  /* Steps */
+  ol.steps { padding-left: 0; list-style: none; counter-reset: step-counter; }
+  ol.steps li {
+    counter-increment: step-counter;
+    display: flex;
+    gap: 14px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+  }
+  ol.steps li::before {
+    content: counter(step-counter);
+    background: var(--aws-dark);
+    color: white;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Code blocks */
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    overflow-x: auto;
+    margin: 8px 0;
+    font-family: 'Consolas', 'Monaco', monospace;
+    line-height: 1.5;
+  }
+  code { font-family: 'Consolas', 'Monaco', monospace; font-size: 0.85em; }
+  p code, li code { background: #F0F4F8; padding: 2px 6px; border-radius: 3px; color: #C0392B; }
+
+  /* Takeaways */
+  .takeaways {
+    background: var(--aws-light-green);
+    border-left: 3px solid var(--aws-green);
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin-top: 16px;
+  }
+  .takeaways p { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.7px; color: var(--aws-green); font-weight: 700; margin-bottom: 8px; }
+  .takeaways ul { padding-left: 18px; }
+  .takeaways ul li { font-size: 0.88rem; margin-bottom: 5px; color: #1B4A2A; }
+
+  /* Summary table */
+  .summary-section { margin: 48px 0; }
+  .summary-section h2 { font-size: 1.5rem; font-weight: 800; color: var(--aws-dark); margin-bottom: 6px; }
+  .summary-section p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th { background: var(--aws-dark); color: white; padding: 10px 14px; text-align: left; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #F8FAFC; }
+  td:first-child { font-weight: 600; color: var(--aws-dark); }
+  td:nth-child(2) { color: var(--aws-blue); }
+  td:nth-child(3) { color: var(--aws-green); }
+
+  /* Footer */
+  footer { background: var(--aws-dark); color: rgba(255,255,255,0.6); text-align: center; padding: 24px; font-size: 0.82rem; }
+  footer a { color: var(--aws-orange); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.6rem; }
+    .toc-grid { grid-template-columns: 1fr; }
+    .domain-banner h2 { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>AWS <span>SAA-C03</span> Hands-On Lab Guide</h1>
+  <p>20 step-by-step labs covering all four exam domains — from IAM and VPCs to Lambda, Aurora, and Cost Optimization.</p>
+  <div class="badge-row">
+    <span class="badge">🔒 Domain 1: Secure (30%)</span>
+    <span class="badge">🔁 Domain 2: Resilient (26%)</span>
+    <span class="badge">⚡ Domain 3: High-Performing (24%)</span>
+    <span class="badge">💰 Domain 4: Cost-Optimized (20%)</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h2>Table of Contents</h2>
+    <div class="toc-grid">
+      <div>
+        <div class="toc-domain">🔒 Secure Architectures</div>
+        <a href="#lab1">Lab 1 — IAM Identity Management</a>
+        <a href="#lab2">Lab 2 — VPC Network Isolation</a>
+        <a href="#lab3">Lab 3 — S3 Encryption &amp; Security</a>
+        <a href="#lab4">Lab 4 — WAF &amp; Shield</a>
+        <a href="#lab5">Lab 5 — Cross-Account IAM Roles</a>
+        <div class="toc-domain">🔁 Resilient Architectures</div>
+        <a href="#lab6">Lab 6 — Multi-AZ Web Application</a>
+        <a href="#lab7">Lab 7 — Auto Scaling for Demand</a>
+        <a href="#lab8">Lab 8 — RDS Multi-AZ &amp; Failover</a>
+        <a href="#lab9">Lab 9 — S3 Cross-Region Replication</a>
+        <a href="#lab10">Lab 10 — Route 53 Failover Routing</a>
+      </div>
+      <div>
+        <div class="toc-domain">⚡ High-Performing Architectures</div>
+        <a href="#lab11">Lab 11 — Serverless API with Lambda</a>
+        <a href="#lab12">Lab 12 — DynamoDB Global Tables</a>
+        <a href="#lab13">Lab 13 — CloudFront CDN</a>
+        <a href="#lab14">Lab 14 — ElastiCache for Performance</a>
+        <a href="#lab15">Lab 15 — VPC Peering &amp; Transit Gateway</a>
+        <div class="toc-domain">💰 Cost-Optimized Architectures</div>
+        <a href="#lab16">Lab 16 — S3 Lifecycle Policies</a>
+        <a href="#lab17">Lab 17 — Spot Instance Fleet</a>
+        <a href="#lab18">Lab 18 — EFS vs. EBS Storage</a>
+        <a href="#lab19">Lab 19 — Compute Optimizer &amp; Cost Explorer</a>
+        <a href="#lab20">Lab 20 — Aurora Serverless v2</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- DOMAIN 1 -->
+  <div class="domain-banner secure">
+    <div class="icon">🔒</div>
+    <div>
+      <h2>Domain 1 — Design Secure Architectures</h2>
+      <p>30% of the exam · Labs 1–5 · IAM, VPC, S3, WAF, Shield</p>
+    </div>
+  </div>
+
+  <!-- Lab 1 -->
+  <div class="lab-card secure open" id="lab1">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">1</div>
+      <div class="lab-title-block">
+        <h3>IAM Identity Management</h3>
+        <div class="meta">
+          <span class="service-tag">IAM</span>
+          Principle of least privilege · Users, Groups &amp; Roles
+        </div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Create IAM users, groups, and roles applying the principle of least privilege to control access to AWS resources.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Sign in to the AWS Management Console and navigate to <strong>IAM</strong>.</li>
+        <li>Click <strong>User groups</strong> → <strong>Create group</strong>. Name it <code>Developers</code> and attach <code>AmazonEC2ReadOnlyAccess</code>.</li>
+        <li>Click <strong>Users</strong> → <strong>Add users</strong>. Username: <code>dev-user-01</code>, enable console access with a custom password.</li>
+        <li>On the Permissions step, add the user to the <code>Developers</code> group.</li>
+        <li>Click <strong>Roles</strong> → <strong>Create role</strong>. Trusted entity: <strong>AWS service</strong>, use case: <strong>EC2</strong>.</li>
+        <li>Attach <code>AmazonS3ReadOnlyAccess</code>, name the role <code>EC2-S3-ReadOnly-Role</code>, create it.</li>
+        <li>Navigate to <strong>Policies</strong> → <strong>Create policy</strong>. Use the JSON editor to write a custom policy allowing only <code>s3:GetObject</code> on a specific bucket ARN.</li>
+        <li>Log in as <code>dev-user-01</code> and confirm EC2 read access works but write/terminate is denied.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Groups simplify permission management across many users.</li>
+          <li>Roles avoid embedding long-term credentials in applications.</li>
+          <li>Always grant only the minimum permissions required (least privilege).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 2 -->
+  <div class="lab-card secure" id="lab2">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">2</div>
+      <div class="lab-title-block">
+        <h3>VPC Network Isolation</h3>
+        <div class="meta"><span class="service-tag">VPC</span><span class="service-tag">EC2</span>Public &amp; private subnets · NAT Gateway · Security Groups</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Design a custom VPC with public and private subnets, NAT Gateway, and Security Groups for a two-tier application.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Go to <strong>VPC</strong> → <strong>Create VPC</strong>. Name: <code>LabVPC</code>, CIDR: <code>10.0.0.0/16</code>.</li>
+        <li>Create two subnets in <code>LabVPC</code>: <code>Public-Subnet-1A</code> (CIDR <code>10.0.1.0/24</code>) and <code>Private-Subnet-1A</code> (CIDR <code>10.0.2.0/24</code>), both in <code>us-east-1a</code>.</li>
+        <li>Enable <strong>Auto-assign public IPv4</strong> on <code>Public-Subnet-1A</code>.</li>
+        <li>Create an <strong>Internet Gateway</strong> (<code>LabIGW</code>) and attach it to <code>LabVPC</code>.</li>
+        <li>Create route table <code>Public-RT</code>: add route <code>0.0.0.0/0 → LabIGW</code>. Associate with <code>Public-Subnet-1A</code>.</li>
+        <li>Allocate an <strong>Elastic IP</strong>. Create a <strong>NAT Gateway</strong> in <code>Public-Subnet-1A</code> using the Elastic IP.</li>
+        <li>Create route table <code>Private-RT</code>: add route <code>0.0.0.0/0 → NAT Gateway</code>. Associate with <code>Private-Subnet-1A</code>.</li>
+        <li>Create <strong>Security Group</strong> <code>WebSG</code>: allow HTTP (80) from <code>0.0.0.0/0</code>, SSH (22) from your IP only.</li>
+        <li>Launch an EC2 instance in <code>Public-Subnet-1A</code> with <code>WebSG</code>. SSH in and confirm internet access.</li>
+        <li>Launch a second EC2 in <code>Private-Subnet-1A</code>. From the public instance, SSH to the private instance, then run <code>curl https://aws.amazon.com</code> — traffic routes through NAT.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Security Groups are <strong>stateful</strong> — return traffic is automatically allowed.</li>
+          <li>NACLs are <strong>stateless</strong> — you must explicitly allow inbound and outbound rules.</li>
+          <li>NAT Gateway lets private instances reach the internet without being publicly reachable.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 3 -->
+  <div class="lab-card secure" id="lab3">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">3</div>
+      <div class="lab-title-block">
+        <h3>S3 Data Encryption &amp; Security</h3>
+        <div class="meta"><span class="service-tag">S3</span><span class="service-tag">KMS</span>SSE-KMS · Bucket Policies · Enforcement</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Implement SSE-KMS server-side encryption and enforce it via Bucket Policies for access control.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Navigate to <strong>KMS</strong> → <strong>Customer managed keys</strong> → <strong>Create key</strong>. Choose Symmetric, Encrypt and decrypt. Name: <code>S3LabKey</code>.</li>
+        <li>Add yourself as key administrator and user. Finish creating the key.</li>
+        <li>Go to <strong>S3</strong> → <strong>Create bucket</strong>. Name: <code>lab-encrypted-bucket-&lt;unique-id&gt;</code>, Block Public Access on.</li>
+        <li>Open bucket → <strong>Properties</strong> → <strong>Default encryption</strong> → <strong>Edit</strong>. Select <strong>SSE-KMS</strong>, choose <code>S3LabKey</code>. Save.</li>
+        <li>Upload a test file — check object properties show <code>aws:kms</code> encryption.</li>
+        <li>Go to <strong>Permissions</strong> → <strong>Bucket policy</strong>. Paste a policy that denies <code>s3:PutObject</code> when the request header <code>s3:x-amz-server-side-encryption</code> is not <code>aws:kms</code>.</li>
+        <li>Attempt to upload via AWS CLI without specifying encryption — confirm it is denied.</li>
+        <li>Upload with <code>--sse aws:kms</code> — confirm success.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>SSE-KMS provides a full audit trail via CloudTrail for every key usage event.</li>
+          <li>Bucket Policies can enforce encryption-at-rest on all incoming objects.</li>
+          <li>KMS Customer Managed Keys give you full control over key rotation and access.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 4 -->
+  <div class="lab-card secure" id="lab4">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">4</div>
+      <div class="lab-title-block">
+        <h3>Web Security with WAF &amp; Shield</h3>
+        <div class="meta"><span class="service-tag">WAF</span><span class="service-tag">Shield</span><span class="service-tag">ALB</span>DDoS protection · Web ACL · Managed Rules</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Protect an Application Load Balancer from common web exploits (SQLi, XSS) and DDoS attacks.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Deploy an EC2 instance with Apache/Nginx in a public subnet. Confirm it serves a web page.</li>
+        <li>Create an <strong>Application Load Balancer</strong> (internet-facing) across two AZs. Register the EC2 as a target. Confirm the ALB DNS serves your page.</li>
+        <li>Go to <strong>WAF &amp; Shield</strong> → <strong>Web ACLs</strong> → <strong>Create web ACL</strong>. Resource type: Regional. Associate with your ALB.</li>
+        <li>Add managed rule group: <strong>AWSManagedRulesCommonRuleSet</strong> (blocks SQLi, XSS, etc.).</li>
+        <li>Add managed rule group: <strong>AWSManagedRulesAmazonIpReputationList</strong> (blocks malicious IPs).</li>
+        <li>Set default action to <strong>Allow</strong>. Create the Web ACL.</li>
+        <li>Test WAF: send a simulated SQLi string in a query parameter (e.g., <code>?id=1' OR '1'='1</code>). Confirm WAF returns HTTP 403.</li>
+        <li>Go to <strong>Shield</strong> — confirm <strong>Shield Standard</strong> is active (automatic for all AWS customers).</li>
+        <li>Review <strong>WAF sampled requests</strong> in the console to see blocked traffic details.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>WAF inspects HTTP/HTTPS at Layer 7 — it can block based on request content.</li>
+          <li>Shield Standard is free and automatic; Shield Advanced adds DDoS response team support.</li>
+          <li>Managed rule groups save time — AWS maintains them against new threat signatures.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 5 -->
+  <div class="lab-card secure" id="lab5">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">5</div>
+      <div class="lab-title-block">
+        <h3>Cross-Account Access with IAM Roles</h3>
+        <div class="meta"><span class="service-tag">IAM</span><span class="service-tag">STS</span>Trust policies · AssumeRole · Temporary credentials</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Configure an IAM role to allow secure, temporary access to resources in a different AWS account without sharing credentials.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>In <strong>Account A</strong>, go to IAM → Roles → <strong>Create role</strong>. Trusted entity: <strong>AWS account</strong>. Enter Account B's Account ID.</li>
+        <li>Attach <code>AmazonS3ReadOnlyAccess</code>. Name the role <code>CrossAccountS3Role</code>. Copy the Role ARN.</li>
+        <li>In <strong>Account B</strong>, create a custom IAM policy allowing <code>sts:AssumeRole</code> on the Role ARN from Account A. Attach it to a user.</li>
+        <li>Log in as the Account B user and run via AWS CLI:</li>
+      </ol>
+      <pre>aws sts assume-role \
+  --role-arn "arn:aws:iam::&lt;AccountA-ID&gt;:role/CrossAccountS3Role" \
+  --role-session-name "CrossAccountSession"</pre>
+      <ol class="steps" start="5">
+        <li>Export the returned temporary credentials as environment variables (<code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code>, <code>AWS_SESSION_TOKEN</code>).</li>
+        <li>Run <code>aws s3 ls</code> — confirm you can list Account A's S3 buckets.</li>
+        <li>Try a write operation — confirm it is denied (read-only policy enforced).</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Cross-account roles use STS to issue <strong>temporary credentials</strong> — no static keys shared between accounts.</li>
+          <li>The trust policy controls <em>who</em> can assume the role; the permission policy controls <em>what</em> they can do.</li>
+          <li>This is the AWS best practice for cross-account access in organizations.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 2 -->
+  <div class="domain-banner resilient">
+    <div class="icon">🔁</div>
+    <div>
+      <h2>Domain 2 — Design Resilient Architectures</h2>
+      <p>26% of the exam · Labs 6–10 · EC2, ALB, RDS, S3, Route 53</p>
+    </div>
+  </div>
+
+  <!-- Lab 6 -->
+  <div class="lab-card resilient" id="lab6">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">6</div>
+      <div class="lab-title-block">
+        <h3>Multi-AZ Web Application</h3>
+        <div class="meta"><span class="service-tag">EC2</span><span class="service-tag">ALB</span><span class="service-tag">Route 53</span>High availability · Load balancing</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Deploy a web server across two Availability Zones using an ALB for high availability and zero-downtime failover.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Launch two EC2 instances: one in <code>us-east-1a</code>, one in <code>us-east-1b</code>. Install Apache on each; configure each to display its AZ name in the default HTML page.</li>
+        <li>Create an <strong>Application Load Balancer</strong> (internet-facing) spanning both AZs. Create a target group <code>WebTG</code> and register both instances.</li>
+        <li>Set the ALB listener (HTTP:80) to forward to <code>WebTG</code>.</li>
+        <li>Access the ALB DNS name in a browser. Refresh multiple times — observe traffic alternating between instances.</li>
+        <li>Stop one instance. Refresh — the ALB routes all traffic to the healthy instance within ~30 seconds.</li>
+        <li>In <strong>Route 53</strong>, create an <strong>A record (Alias)</strong> pointing to the ALB DNS name in your hosted zone.</li>
+        <li>Access via your domain — confirm traffic is served and resilient to single-AZ failure.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>ALB health checks automatically remove unhealthy instances from rotation.</li>
+          <li>Route 53 Alias records resolve directly to ALB with no extra DNS hop.</li>
+          <li>Spreading across AZs protects against data center failures.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 7 -->
+  <div class="lab-card resilient" id="lab7">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">7</div>
+      <div class="lab-title-block">
+        <h3>Auto Scaling for Demand</h3>
+        <div class="meta"><span class="service-tag">ASG</span><span class="service-tag">CloudWatch</span>Target tracking · Scale-out/in · CPU stress test</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Configure an Auto Scaling Group with target tracking to automatically add or remove EC2 instances based on CPU utilization.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Create a <strong>Launch Template</strong>: AMI = Amazon Linux 2, type <code>t3.micro</code>. User data installs the <code>stress</code> tool.</li>
+        <li>Go to <strong>Auto Scaling Groups</strong> → <strong>Create Auto Scaling group</strong>. Select your launch template, VPC, and public subnets in both AZs.</li>
+        <li>Attach to the ALB target group from Lab 6.</li>
+        <li>Set capacity: <strong>Desired: 2, Minimum: 1, Maximum: 4</strong>.</li>
+        <li>Add a <strong>Target Tracking Scaling Policy</strong>: metric = Average CPU Utilization, target = <code>50%</code>.</li>
+        <li>SSH into an instance and run a CPU stress test:</li>
+      </ol>
+      <pre>stress --cpu 4 --timeout 300</pre>
+      <ol class="steps" start="7">
+        <li>Monitor <strong>CloudWatch</strong> ASG metrics — within ~3 minutes, observe new instances launching (scale-out).</li>
+        <li>Stop the stress test. After ~10 minutes observe scale-in back to minimum.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Target tracking automatically adjusts capacity — no manual thresholds needed.</li>
+          <li>Cooldown periods prevent thrashing during rapid scaling events.</li>
+          <li>ALB automatically registers and deregisters ASG instances as they scale.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 8 -->
+  <div class="lab-card resilient" id="lab8">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">8</div>
+      <div class="lab-title-block">
+        <h3>RDS Multi-AZ &amp; Failover</h3>
+        <div class="meta"><span class="service-tag">RDS</span><span class="service-tag">Aurora</span>Synchronous replication · Automatic failover · Zero data loss</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Launch an RDS MySQL instance with Multi-AZ enabled and simulate a primary node failure to observe automatic failover.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Go to <strong>RDS</strong> → <strong>Create database</strong>. Engine: MySQL. Enable <strong>Multi-AZ deployment</strong>.</li>
+        <li>DB identifier: <code>lab-mysql-db</code>. VPC: <code>LabVPC</code>. Subnet group covering two AZs. Security group: allow MySQL (3306) from your EC2.</li>
+        <li>Note the endpoint DNS and which AZ is primary after creation.</li>
+        <li>Connect from EC2: <code>mysql -h &lt;endpoint&gt; -u admin -p</code>. Create a test table, insert rows.</li>
+        <li>In the RDS console → select DB → <strong>Actions</strong> → <strong>Reboot</strong> → check <strong>Reboot With Failover</strong>. Confirm.</li>
+        <li>Monitor the MySQL connection — it drops briefly, then reconnects automatically (same endpoint DNS).</li>
+        <li>After reboot completes, check the console — the primary AZ has changed.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Multi-AZ = <strong>synchronous</strong> replication → zero data loss on failover (HA).</li>
+          <li>The standby is <strong>not readable</strong>. Use Read Replicas for read scaling (asynchronous).</li>
+          <li>Application code using the RDS DNS endpoint requires no changes during failover.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 9 -->
+  <div class="lab-card resilient" id="lab9">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">9</div>
+      <div class="lab-title-block">
+        <h3>S3 Cross-Region Replication</h3>
+        <div class="meta"><span class="service-tag">S3</span>CRR · Versioning · Disaster recovery</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Automate replication of S3 objects to a different AWS region for disaster recovery purposes.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Create source bucket <code>lab-source-crr-&lt;id&gt;</code> in <code>us-east-1</code>. Enable <strong>Versioning</strong> (required for CRR).</li>
+        <li>Create destination bucket <code>lab-dest-crr-&lt;id&gt;</code> in <code>us-west-2</code>. Enable Versioning.</li>
+        <li>In the source bucket → <strong>Management</strong> → <strong>Replication rules</strong> → <strong>Create replication rule</strong>. Name: <code>CRR-to-West</code>.</li>
+        <li>Source: apply to all objects. Destination: select <code>lab-dest-crr-&lt;id&gt;</code>. Let AWS create a new IAM role. Save.</li>
+        <li>Upload a test file to the source bucket.</li>
+        <li>Wait 30–60 seconds, then check the destination bucket in <code>us-west-2</code> — the object should appear.</li>
+        <li>Check the object's <strong>Replication status</strong> — should show <code>COMPLETED</code>.</li>
+        <li>Enable <strong>Delete marker replication</strong> and test: delete an object in the source — observe the delete marker in the destination.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>CRR requires versioning enabled on both source and destination buckets.</li>
+          <li>Supports cross-account replication for additional isolation.</li>
+          <li>Replication is asynchronous — objects appear in the destination within seconds to minutes.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 10 -->
+  <div class="lab-card resilient" id="lab10">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">10</div>
+      <div class="lab-title-block">
+        <h3>Route 53 Failover Routing</h3>
+        <div class="meta"><span class="service-tag">Route 53</span>Health checks · Failover policy · DNS routing</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Implement Route 53 health checks and failover routing to redirect DNS traffic automatically during an outage.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Set up two web servers: Primary in <code>us-east-1</code>, Secondary in <code>us-west-2</code> (or S3 static websites).</li>
+        <li>Go to <strong>Route 53</strong> → <strong>Health Checks</strong> → <strong>Create health check</strong>. Protocol: HTTP, IP = primary server, path: <code>/</code>.</li>
+        <li>Create DNS A record (Primary): routing policy = <strong>Failover</strong>, type = <strong>Primary</strong>, associate the health check.</li>
+        <li>Create DNS A record (Secondary): routing policy = <strong>Failover</strong>, type = <strong>Secondary</strong> (no health check needed).</li>
+        <li>Access your domain — traffic should reach the primary server.</li>
+        <li>Stop the primary web server (or block port 80). Wait ~30–60 seconds for the health check to go <strong>Unhealthy</strong>.</li>
+        <li>Re-query the DNS — Route 53 now returns the secondary server's IP.</li>
+        <li>Restart the primary — the health check recovers and Route 53 fails back automatically.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Failover routing requires a health check attached to the primary record.</li>
+          <li>Route 53 TTL affects how quickly DNS changes propagate to clients after failover.</li>
+          <li>Health check interval default is 30 seconds — adjust for faster detection.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 3 -->
+  <div class="domain-banner perform">
+    <div class="icon">⚡</div>
+    <div>
+      <h2>Domain 3 — Design High-Performing Architectures</h2>
+      <p>24% of the exam · Labs 11–15 · Lambda, DynamoDB, CloudFront, ElastiCache, VPC</p>
+    </div>
+  </div>
+
+  <!-- Lab 11 -->
+  <div class="lab-card perform" id="lab11">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">11</div>
+      <div class="lab-title-block">
+        <h3>Serverless API with Lambda</h3>
+        <div class="meta"><span class="service-tag">Lambda</span><span class="service-tag">API Gateway</span>Serverless · Auto-scaling · Pay-per-use</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Build a RESTful API using API Gateway and Lambda to handle variable traffic without managing servers.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Go to <strong>Lambda</strong> → <strong>Create function</strong> → Author from scratch. Name: <code>HelloWorldFunction</code>, runtime: Python 3.12.</li>
+        <li>Paste this handler code and click <strong>Deploy</strong>:</li>
+      </ol>
+      <pre>import json
+def lambda_handler(event, context):
+    name = event.get('queryStringParameters', {}).get('name', 'World')
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'message': f'Hello, {name}!'})
+    }</pre>
+      <ol class="steps" start="3">
+        <li>Go to <strong>API Gateway</strong> → <strong>Create API</strong> → <strong>HTTP API</strong>. Add integration: Lambda → <code>HelloWorldFunction</code>. Route: <code>GET /hello</code>. Stage: <code>$default</code>. Create.</li>
+        <li>Copy the Invoke URL. Open a browser: <code>&lt;invoke-url&gt;/hello?name=AWS</code> — verify the JSON response.</li>
+        <li>Go to Lambda → <strong>Monitor</strong> tab → view invocation metrics in CloudWatch Logs.</li>
+        <li>Run a concurrent load test to see Lambda scale automatically with no server management.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Lambda charges only for compute time (millisecond precision) — zero cost at idle.</li>
+          <li>API Gateway handles auth, throttling, rate limiting, and routing.</li>
+          <li>Serverless removes the need to manage, patch, or right-size servers.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 12 -->
+  <div class="lab-card perform" id="lab12">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">12</div>
+      <div class="lab-title-block">
+        <h3>DynamoDB Global Tables</h3>
+        <div class="meta"><span class="service-tag">DynamoDB</span>Multi-region replication · Active-active · Low latency</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Create a NoSQL database with active-active multi-region replication for low-latency global access.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Go to <strong>DynamoDB</strong> → <strong>Create table</strong>. Name: <code>GlobalUsersTable</code>, partition key: <code>userId</code> (String).</li>
+        <li>Wait for status <strong>Active</strong>. Go to the <strong>Global Tables</strong> tab → <strong>Create replica</strong> → add region <code>us-west-2</code>.</li>
+        <li>In <code>us-east-1</code>, insert item: <code>userId = user-001, name = Alice</code>.</li>
+        <li>Switch to <code>us-west-2</code> console → open the replica → confirm <code>user-001</code> replicated (typically milliseconds).</li>
+        <li>Update the item in <code>us-west-2</code>: change <code>name = Alice Updated</code>.</li>
+        <li>Switch back to <code>us-east-1</code> — confirm the update is reflected (last-writer-wins).</li>
+        <li>Measure latency: query the table from an EC2 in each region and compare response times.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Global Tables use <strong>active-active</strong> replication — writes accepted in any region.</li>
+          <li>Conflict resolution is last-writer-wins based on timestamp.</li>
+          <li>Ideal for globally distributed apps requiring single-digit millisecond reads.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 13 -->
+  <div class="lab-card perform" id="lab13">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">13</div>
+      <div class="lab-title-block">
+        <h3>CloudFront Content Delivery</h3>
+        <div class="meta"><span class="service-tag">CloudFront</span><span class="service-tag">S3</span>CDN · Edge caching · OAC · Cache hit/miss</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Configure a CloudFront CDN distribution to cache static content at edge locations and reduce latency globally.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Create S3 bucket <code>lab-cloudfront-origin-&lt;id&gt;</code> in <code>us-east-1</code>. Upload static files. Keep bucket private.</li>
+        <li>Go to <strong>CloudFront</strong> → <strong>Create distribution</strong>. Origin: your S3 bucket. For <strong>Origin access</strong>, select <strong>Origin Access Control (OAC)</strong> → create new OAC.</li>
+        <li>Copy the generated S3 bucket policy shown by CloudFront and apply it to your bucket's permissions.</li>
+        <li>Cache behavior: policy = <strong>CachingOptimized</strong>, viewer protocol = <strong>Redirect HTTP to HTTPS</strong>. Create.</li>
+        <li>Wait ~5–10 minutes for status: <strong>Enabled</strong>. Access: <code>&lt;distro-id&gt;.cloudfront.net/index.html</code>.</li>
+        <li>First request: check response header <code>X-Cache = Miss from cloudfront</code> (served from S3).</li>
+        <li>Second request to same URL: <code>X-Cache = Hit from cloudfront</code> (served from edge cache).</li>
+        <li>Enable CloudFront access logs to an S3 bucket. Review cache hit ratios.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>OAC is the modern recommended way to restrict S3 access to CloudFront only.</li>
+          <li>Cache hits reduce latency dramatically and reduce S3 request costs.</li>
+          <li>CloudFront has 400+ edge locations — content is served from the nearest PoP.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 14 -->
+  <div class="lab-card perform" id="lab14">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">14</div>
+      <div class="lab-title-block">
+        <h3>ElastiCache for Performance</h3>
+        <div class="meta"><span class="service-tag">ElastiCache</span>Redis · Cache-aside pattern · TTL · DB offload</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Implement a Redis cluster to cache frequent database query results and dramatically reduce database load.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Go to <strong>ElastiCache</strong> → <strong>Redis clusters</strong> → <strong>Create Redis cluster</strong>. Easy create, node type <code>cache.t3.micro</code>. Name: <code>LabRedisCluster</code>. VPC: <code>LabVPC</code>.</li>
+        <li>Security group: allow Redis port 6379 from your EC2 security group. Wait for status <strong>Available</strong>.</li>
+        <li>Install Redis CLI on your EC2:</li>
+      </ol>
+      <pre>sudo amazon-linux-extras install redis6</pre>
+      <ol class="steps" start="4">
+        <li>Connect: <code>redis-cli -h &lt;primary-endpoint&gt; -p 6379</code></li>
+        <li>Set a key with TTL: <code>SET db:user:1 '{"name":"Alice"}' EX 300</code></li>
+        <li>Get the key: <code>GET db:user:1</code> — instant retrieval from cache.</li>
+        <li>Implement cache-aside in Python: check Redis first; on miss, query DB, then write to Redis. Measure latency difference.</li>
+        <li>Wait for TTL (300s) to expire — <code>GET</code> returns nil, forcing a DB re-query (cache miss).</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Cache-aside (lazy loading) only caches what is actually read — efficient memory use.</li>
+          <li>TTL prevents stale data from persisting indefinitely in the cache.</li>
+          <li>ElastiCache can reduce DB load by 80%+ for read-heavy workloads.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 15 -->
+  <div class="lab-card perform" id="lab15">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">15</div>
+      <div class="lab-title-block">
+        <h3>VPC Peering &amp; Transit Gateway</h3>
+        <div class="meta"><span class="service-tag">VPC</span><span class="service-tag">Transit Gateway</span>Private connectivity · Hub-and-spoke · Transitive routing</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Connect multiple VPCs to enable private communication — first via VPC Peering, then via Transit Gateway for transitive routing.</div>
+      <h4>Part A — VPC Peering</h4>
+      <ol class="steps">
+        <li>Create <code>VPC-A</code> (<code>10.1.0.0/16</code>) and <code>VPC-B</code> (<code>10.2.0.0/16</code>), each with a subnet and an EC2 instance.</li>
+        <li>Go to <strong>VPC Peering Connections</strong> → <strong>Create peering connection</strong>. Requester: <code>VPC-A</code>, Accepter: <code>VPC-B</code>. Accept the request.</li>
+        <li>Update route tables: <code>VPC-A</code> → add <code>10.2.0.0/16</code> via peering; <code>VPC-B</code> → add <code>10.1.0.0/16</code> via peering.</li>
+        <li>Update Security Groups to allow ICMP/SSH from the other VPC's CIDR. Ping between EC2s.</li>
+      </ol>
+      <h4>Part B — Transit Gateway</h4>
+      <ol class="steps">
+        <li>Create <code>VPC-C</code> (<code>10.3.0.0/16</code>) with an EC2 instance.</li>
+        <li>Go to <strong>Transit Gateways</strong> → <strong>Create Transit Gateway</strong>. Note the TGW ID.</li>
+        <li>Create <strong>Transit Gateway Attachments</strong> for VPC-A, VPC-B, and VPC-C.</li>
+        <li>Add routes in each VPC's route table pointing to the other two VPCs' CIDRs via the TGW.</li>
+        <li>Ping between all three EC2 instances using private IPs — all should succeed.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>VPC Peering is <strong>non-transitive</strong> — A↔B and B↔C does not give A↔C connectivity.</li>
+          <li>Transit Gateway enables <strong>transitive routing</strong> — a central hub for thousands of VPCs.</li>
+          <li>Use TGW for complex multi-VPC architectures; VPC Peering for simple point-to-point connections.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 4 -->
+  <div class="domain-banner cost">
+    <div class="icon">💰</div>
+    <div>
+      <h2>Domain 4 — Design Cost-Optimized Architectures</h2>
+      <p>20% of the exam · Labs 16–20 · S3, EC2 Spot, EBS, EFS, Aurora Serverless</p>
+    </div>
+  </div>
+
+  <!-- Lab 16 -->
+  <div class="lab-card cost" id="lab16">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">16</div>
+      <div class="lab-title-block">
+        <h3>S3 Lifecycle Policies</h3>
+        <div class="meta"><span class="service-tag">S3 Lifecycle</span>Storage tiers · Glacier · Automated cost reduction</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Automatically transition aging data through S3 storage classes to minimize storage costs over time.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Create bucket <code>lab-lifecycle-&lt;id&gt;</code>. Enable versioning. Upload several test objects.</li>
+        <li>Go to <strong>Management</strong> → <strong>Lifecycle rules</strong> → <strong>Create lifecycle rule</strong>. Name: <code>DataTiering</code>. Apply to all objects.</li>
+        <li>Add transitions: 30 days → <strong>S3 Standard-IA</strong>; 90 days → <strong>S3 Intelligent-Tiering</strong>; 180 days → <strong>S3 Glacier Flexible Retrieval</strong>; 365 days → <strong>S3 Glacier Deep Archive</strong>.</li>
+        <li>Add expiration: expire current object versions after 730 days.</li>
+        <li>Add noncurrent version expiration: delete noncurrent versions after 90 days.</li>
+        <li>Save the rule and review the rule summary in the console.</li>
+        <li>Manually change an existing object's storage class to <strong>S3 Standard-IA</strong> and compare per-GB pricing.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Standard-IA minimum storage duration: <strong>30 days</strong>. Glacier Deep Archive: <strong>180 days</strong>.</li>
+          <li>Lifecycle rules run automatically — set it once, save forever.</li>
+          <li>Intelligent-Tiering is ideal for unpredictable access patterns — AWS optimizes tiers automatically.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 17 -->
+  <div class="lab-card cost" id="lab17">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">17</div>
+      <div class="lab-title-block">
+        <h3>Spot Instance Fleet</h3>
+        <div class="meta"><span class="service-tag">EC2 Spot</span>Up to 90% cost savings · Mixed Instances Policy · Fault-tolerant workloads</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Use EC2 Spot Instances for fault-tolerant workloads to achieve up to 90% savings compared to On-Demand pricing.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Go to <strong>EC2</strong> → <strong>Spot Requests</strong> → <strong>Request Spot Instances</strong>. AMI: Amazon Linux 2, type: <code>c5.large</code>. Max price: default (on-demand cap).</li>
+        <li>Fleet settings: <strong>Maintain target capacity</strong> = 2 instances. Interruption behavior: <strong>Terminate</strong>. Note estimated savings vs On-Demand.</li>
+        <li>Launch the fleet. Observe two Spot instances running in EC2 → Instances.</li>
+        <li>Create an <strong>Auto Scaling Group</strong> with a <strong>Mixed Instances Policy</strong>:</li>
+      </ol>
+      <pre>On-Demand base: 1 instance (always reliable)
+Spot percentage: 80% of additional capacity</pre>
+      <ol class="steps" start="5">
+        <li>Confirm the ASG launches a mix of On-Demand and Spot instances.</li>
+        <li>Review the <strong>Spot Instance Advisor</strong> to select instance types with low interruption frequency.</li>
+        <li>Add a Spot interruption handler in user data to gracefully drain tasks on 2-minute warning.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Spot Instances can be interrupted with a 2-minute warning — design workloads to handle this gracefully.</li>
+          <li>Best for stateless, batch, CI/CD, big data, and rendering workloads.</li>
+          <li>Mixed Instances Policy = savings + reliability baseline from On-Demand base capacity.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 18 -->
+  <div class="lab-card cost" id="lab18">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">18</div>
+      <div class="lab-title-block">
+        <h3>EFS vs. EBS for Shared Storage</h3>
+        <div class="meta"><span class="service-tag">EBS</span><span class="service-tag">EFS</span>Block vs. file storage · Shared access · Cost comparison</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Compare EBS block storage and EFS elastic file system costs, use cases, and performance characteristics.</div>
+      <h4>Part A — EBS (Block Storage)</h4>
+      <ol class="steps">
+        <li>Launch an EC2 instance. Attach a second EBS volume (gp3, 10 GB) in the same AZ.</li>
+        <li>SSH in. Format and mount:</li>
+      </ol>
+      <pre>sudo mkfs -t ext4 /dev/xvdf
+sudo mkdir /data && sudo mount /dev/xvdf /data</pre>
+      <ol class="steps" start="3">
+        <li>Write a large test file: <code>dd if=/dev/zero of=/data/testfile bs=1M count=500</code>. Note EBS is tied to one AZ and one instance.</li>
+      </ol>
+      <h4>Part B — EFS (Elastic File System)</h4>
+      <ol class="steps">
+        <li>Go to <strong>EFS</strong> → <strong>Create file system</strong>, select <code>LabVPC</code>. Create mount targets in each subnet/AZ. Security group: allow NFS (2049) from EC2.</li>
+        <li>On two EC2 instances (different AZs), install and mount EFS:</li>
+      </ol>
+      <pre>sudo yum install -y amazon-efs-utils
+sudo mkdir /efs && sudo mount -t efs &lt;fs-id&gt;:/ /efs</pre>
+      <ol class="steps" start="3">
+        <li>On Instance 1: <code>echo "hello from AZ-1" &gt; /efs/shared.txt</code></li>
+        <li>On Instance 2: <code>cat /efs/shared.txt</code> — confirms shared, concurrent access across AZs.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li><strong>EBS</strong>: ~$0.08/GB/mo (gp3). Single AZ. Single instance. Low latency. Use for DBs and boot volumes.</li>
+          <li><strong>EFS</strong>: ~$0.30/GB/mo (Standard). Multi-AZ. Shared. Auto-scales. Use for shared application data.</li>
+          <li>EFS is more expensive per GB but eliminates the need to manage multiple volumes.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 19 -->
+  <div class="lab-card cost" id="lab19">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">19</div>
+      <div class="lab-title-block">
+        <h3>Compute Optimizer &amp; Cost Explorer</h3>
+        <div class="meta"><span class="service-tag">Cost Explorer</span><span class="service-tag">Compute Optimizer</span>Rightsizing · Savings Plans · Cost allocation</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Use AWS cost analysis tools to identify over-provisioned resources and rightsizing opportunities.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Launch an <code>m5.xlarge</code> EC2 instance with minimal load for a few hours.</li>
+        <li>Navigate to <strong>AWS Compute Optimizer</strong> → <strong>Opt in</strong> (if not already opted in).</li>
+        <li>After 24–48 hours, go to <strong>EC2 instances</strong> under Compute Optimizer. Review <strong>Over-provisioned</strong> findings. Note the recommended downsizing (e.g., <code>m5.large</code>).</li>
+        <li>Navigate to <strong>AWS Cost Explorer</strong> → <strong>Enable</strong>. Set date range to last 30 days. View costs by Service.</li>
+        <li>Open <strong>Rightsizing recommendations</strong>: view EC2 instances with low utilization and estimated monthly savings.</li>
+        <li>Open the <strong>Savings Plans</strong> wizard: estimate savings from a 1-year Compute Savings Plan commitment.</li>
+        <li>Filter cost reports by <strong>tag</strong> (requires tagged resources) to see per-project or per-team costs.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Compute Optimizer uses CloudWatch metrics + ML to recommend right-sized instances.</li>
+          <li>Cost Explorer rightsizing identifies under-utilized EC2 instances across your account.</li>
+          <li>Tagging every resource is essential for meaningful cost allocation and showback/chargeback.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab 20 -->
+  <div class="lab-card cost" id="lab20">
+    <div class="lab-header" onclick="toggle(this)">
+      <div class="lab-num">20</div>
+      <div class="lab-title-block">
+        <h3>Aurora Serverless v2</h3>
+        <div class="meta"><span class="service-tag">Aurora Serverless</span>ACU auto-scaling · Pay-per-use · Variable workloads</div>
+      </div>
+      <div class="toggle-icon">▼</div>
+    </div>
+    <div class="lab-body">
+      <div class="objective-box">Deploy an Aurora Serverless v2 database that scales capacity automatically on demand to minimize costs for variable workloads.</div>
+      <h4>Steps</h4>
+      <ol class="steps">
+        <li>Go to <strong>RDS</strong> → <strong>Create database</strong>. Engine: <strong>Aurora (MySQL Compatible)</strong>. Edition: <strong>Aurora Serverless v2</strong>.</li>
+        <li>DB cluster identifier: <code>lab-aurora-serverless</code>. Instance configuration: <strong>Serverless v2</strong>.</li>
+        <li>Set <strong>Minimum ACUs: 0.5</strong>, <strong>Maximum ACUs: 16</strong> (1 ACU ≈ 2 GB RAM). VPC: <code>LabVPC</code>. Create.</li>
+        <li>Connect from EC2: <code>mysql -h &lt;cluster-endpoint&gt; -u admin -p</code>. Create a table and insert rows.</li>
+        <li>With load idle, open <strong>CloudWatch</strong> → Aurora metric <strong>ServerlessDatabaseCapacity</strong> — observe it near minimum ACU.</li>
+        <li>Run a load test inserting 10,000 rows in a loop (Python <code>mysql-connector</code> or <code>sysbench</code>).</li>
+        <li>Watch <strong>ServerlessDatabaseCapacity</strong> — observe ACU scaling up within seconds to handle the load.</li>
+        <li>Stop the load test — observe scale-down back toward minimum ACU.</li>
+      </ol>
+      <div class="takeaways">
+        <p>Key Takeaways</p>
+        <ul>
+          <li>Aurora Serverless v2 scales in <strong>0.5 ACU increments</strong> within seconds — fine-grained and fast.</li>
+          <li>Ideal for variable, unpredictable, dev/test, and intermittent production workloads.</li>
+          <li>You only pay for ACU-hours consumed — not provisioned capacity sitting idle.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Table -->
+  <div class="summary-section">
+    <h2>Critical Technical Differentiators</h2>
+    <p>Frequently tested distinctions on the SAA-C03 exam.</p>
+    <table>
+      <tr><th>Topic</th><th>Option A</th><th>Option B</th></tr>
+      <tr><td>Network Security</td><td>Security Groups (stateful, instance-level)</td><td>NACLs (stateless, subnet-level)</td></tr>
+      <tr><td>DB High Availability</td><td>Multi-AZ (synchronous, auto-failover, HA)</td><td>Read Replicas (asynchronous, read scaling)</td></tr>
+      <tr><td>S3 Storage Cost</td><td>Standard → Standard-IA → Glacier Deep Archive</td><td>Intelligent-Tiering (auto, unknown patterns)</td></tr>
+      <tr><td>Global Traffic</td><td>CloudFront (caching, edge, HTTP/S)</td><td>Global Accelerator (static IPs, TCP/UDP perf)</td></tr>
+      <tr><td>VPC Connectivity</td><td>VPC Peering (non-transitive, point-to-point)</td><td>Transit Gateway (transitive, hub-and-spoke)</td></tr>
+      <tr><td>Compute Cost</td><td>On-Demand (no commitment, full price)</td><td>Spot (~90% cheaper, interruptible)</td></tr>
+      <tr><td>File Storage</td><td>EBS (single AZ, single instance, fast)</td><td>EFS (multi-AZ, shared, auto-scales)</td></tr>
+      <tr><td>DB Scaling</td><td>Aurora Provisioned (predictable load)</td><td>Aurora Serverless v2 (variable load)</td></tr>
+    </table>
+  </div>
+
+</main>
+
+<footer>
+  AWS SAA-C03 Lab Guide · <a href="https://itlearning.ng/aws-solution-architect-associate-course-labs/" target="_blank">itlearning.ng</a> · Always clean up resources after each lab to avoid unexpected charges.
+</footer>
+
+<script>
+function toggle(header) {
+  const card = header.closest('.lab-card');
+  card.classList.toggle('open');
+}
+// Open first card by default already done via class; open all on load can be removed
+</script>
+</body>
+</html>

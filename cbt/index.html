@@ -1,0 +1,166 @@
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS SAA-C03 Exam Prep Guide 2026</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; }
+        body { font-family: 'Segoe UI', Roboto, system-ui, sans-serif; line-height: 1.7; color: #1e293b; background: #f8fafc; padding: 2rem; }
+        .container { max-width: 1100px; margin: 0 auto; background: white; border-radius: 24px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); padding: 2.5rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; color: #0f172a; border-left: 6px solid #ff9900; padding-left: 1.2rem; margin-bottom: 0.5rem; }
+        h2 { font-size: 1.8rem; font-weight: 600; color: #1e293b; margin: 2rem 0 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        h3 { font-size: 1.3rem; font-weight: 600; color: #334155; margin: 1.8rem 0 0.8rem; }
+        .badge { background: #ff9900; color: #0f172a; font-weight: 600; padding: 0.2rem 0.8rem; border-radius: 30px; font-size: 0.9rem; display: inline-block; margin-right: 0.5rem; }
+        .domain-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.2rem; margin: 2rem 0; }
+        .domain-card { background: #f1f5f9; border-radius: 16px; padding: 1.2rem; border-top: 4px solid #ff9900; }
+        .domain-card h4 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .weight { font-weight: 700; color: #0f172a; }
+        .service-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .service-table th { background: #1e293b; color: white; font-weight: 600; padding: 0.8rem; text-align: left; }
+        .service-table td { padding: 0.8rem; border-bottom: 1px solid #e2e8f0; }
+        .service-table tr:last-child td { border-bottom: none; }
+        .tip { background: #fef9c3; border-left: 4px solid #eab308; padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 8px; }
+        .highlight { background: #fff7ed; padding: 0.2rem 0.4rem; border-radius: 6px; font-weight: 500; color: #9a3412; }
+        .faq { background: #f8fafc; padding: 1.5rem; border-radius: 16px; margin: 2rem 0; }
+        hr { margin: 2rem 0; border: 0; height: 1px; background: #e2e8f0; }
+        @media (max-width: 700px) { body { padding: 0.8rem; } .container { padding: 1.5rem; } .domain-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>☁️ AWS Certified Solutions Architect Associate <br><span style="font-size:1.5rem;">SAA-C03 · 2026 Edition</span></h1>
+    <p style="font-size:1.2rem; color:#475569; margin-bottom:2rem;">Your focused, high‑yield guide to pass the exam on April 29, 2026 — covering all four domains with practical architecture decisions and 2026 exam insights.</p>
+
+    <!-- Domain overview -->
+    <div class="domain-grid">
+        <div class="domain-card"><h4>🔒 Domain 1</h4><span class="weight">30%</span><br>Design Secure Architectures</div>
+        <div class="domain-card"><h4>⚡ Domain 2</h4><span class="weight">26%</span><br>Design Resilient Architectures</div>
+        <div class="domain-card"><h4>📈 Domain 3</h4><span class="weight">24%</span><br>Design High-Performing Architectures</div>
+        <div class="domain-card"><h4>💰 Domain 4</h4><span class="weight">20%</span><br>Design Cost-Optimized Architectures</div>
+    </div>
+    <p style="color:#475569;">The SAA-C03 exam consists of 65 questions (50 scored, 15 unscored). You need 720/1000 to pass. No negative marking.<br> <strong>Focus:</strong> architectural decision‑making, trade‑offs, and AWS Well‑Architected best practices.</p>
+
+    <!-- SECTION 1: SECURE ARCHITECTURES (30%) -->
+    <h2>🔐 1. Design Secure Architectures (30% of exam)</h2>
+    <p>Security is now the heaviest-weighted domain. Every architecture must begin with <strong>least privilege</strong> and <strong>private connectivity</strong>.</p>
+    <h3>🔑 IAM – Identity & Access Management</h3>
+    <ul>
+        <li><span class="highlight">IAM Roles</span> over long‑term access keys. Use roles for EC2, Lambda, and cross‑account access.</li>
+        <li><span class="highlight">IAM Policies:</span> JSON structure with Effect, Action, Resource. Prefer managed policies where possible.</li>
+        <li><span class="highlight">IAM Identity Center</span> (successor to AWS SSO) for workforce identity federation.</li>
+        <li><span class="highlight">SCPs</span> (Service Control Policies) for AWS Organizations – guardrails across accounts.</li>
+    </ul>
+    <h3>🔒 Encryption & Key Management</h3>
+    <ul>
+        <li><span class="highlight">KMS</span> (AWS Key Management Service): Symmetric vs asymmetric keys, automatic key rotation.</li>
+        <li><span class="highlight">Encryption at rest:</span> S3 (SSE‑S3, SSE‑KMS, DSSE‑KMS), EBS, RDS, DynamoDB.</li>
+        <li><span class="highlight">Encryption in transit:</span> TLS everywhere; use AWS Certificate Manager (ACM) for free public certs.</li>
+        <li><span class="highlight">CloudHSM</span> for dedicated hardware security modules (compliance-heavy workloads).</li>
+    </ul>
+    <h3>🌐 Network Security – VPC</h3>
+    <ul>
+        <li><span class="highlight">Security Groups</span> (stateful) vs <span class="highlight">Network ACLs</span> (stateless).</li>
+        <li><span class="highlight">VPC Endpoints</span> (Gateway for S3/DynamoDB, Interface for others) to keep traffic within AWS.</li>
+        <li><span class="highlight">AWS Network Firewall</span> & <span class="highlight">WAF</span> for application‑layer protection.</li>
+        <li><span class="highlight">AWS Shield</span> (Standard automatic, Advanced for DDoS protection).</li>
+    </ul>
+    <div class="tip"><strong>💡 Exam Tip:</strong> If a scenario allows <em>private access</em> (VPC Endpoint) over public internet, the private option is almost always correct.</div>
+
+    <!-- SECTION 2: RESILIENT ARCHITECTURES (26%) -->
+    <h2>⚡ 2. Design Resilient Architectures (26%)</h2>
+    <h3>🔄 High Availability & Fault Tolerance</h3>
+    <ul>
+        <li><span class="highlight">Multi‑AZ deployments</span> for RDS, Aurora, ElastiCache, and EC2 Auto Scaling across AZs.</li>
+        <li><span class="highlight">Load Balancers:</span> ALB (Layer7, path/host routing), NLB (Layer4, static IP), GWLB (appliance).</li>
+        <li><span class="highlight">Route 53</span> routing policies: Simple, Weighted, Latency, Failover, Geolocation.</li>
+    </ul>
+    <h3>📦 Decoupling & Messaging</h3>
+    <ul>
+        <li><span class="highlight">SQS</span> (Standard vs FIFO) + <span class="highlight">SNS</span> for pub/sub + <span class="highlight">EventBridge</span> for event buses.</li>
+        <li><span class="highlight">AWS Step Functions</span> for serverless workflows with error handling.</li>
+    </ul>
+    <h3>🛡️ Disaster Recovery (DR) Strategies</h3>
+    <table class="service-table">
+        <tr><th>Strategy</th><th>RPO</th><th>RTO</th><th>Cost</th><th>Exam Cue</th></tr>
+        <tr><td>Backup & Restore</td><td>Hours</td><td>24h+</td><td>Lowest</td><td>When cost is primary</td></tr>
+        <tr><td>Pilot Light</td><td>Minutes</td><td>Tens of min</td><td>Low</td><td>Core services pre‑provisioned</td></tr>
+        <tr><td>Warm Standby</td><td>Seconds</td><td>Minutes</td><td>Medium</td><td>Scaled‑down but functional</td></tr>
+        <tr><td>Multi‑Site Active/Active</td><td>Near‑Zero</td><td>Near‑Zero</td><td>Highest</td><td>Only when zero‑downtime mandated</td></tr>
+    </table>
+    <p><strong>Exam insight:</strong> AWS will ask for the <em>most cost‑effective</em> solution that meets stated RTO/RPO. Don't over‑engineer.</p>
+
+    <!-- SECTION 3: HIGH-PERFORMING ARCHITECTURES (24%) -->
+    <h2>📈 3. Design High-Performing Architectures (24%)</h2>
+    <h3>💻 Compute & Scaling</h3>
+    <ul>
+        <li><span class="highlight">EC2 Auto Scaling</span> with launch templates, lifecycle hooks, and scaling policies (target tracking, step, scheduled).</li>
+        <li><span class="highlight">AWS Lambda</span> concurrency, provisioned concurrency, and Lambda@Edge for global low latency.</li>
+        <li><span class="highlight">Elastic Load Balancing:</span> ALB supports gRPC, WebSockets; NLB preserves source IP.</li>
+    </ul>
+    <h3>🗄️ Storage Performance</h3>
+    <table class="service-table">
+        <tr><th>Service</th><th>Type</th><th>Performance Tuning</th></tr>
+        <tr><td>Amazon S3</td><td>Object</td><td>S3 Transfer Acceleration, multipart upload, S3 Intelligent‑Tiering</td></tr>
+        <tr><td>Amazon EBS</td><td>Block</td><td><span class="highlight">gp3</span> (independent IOPS/throughput), io2 Block Express</td></tr>
+        <tr><td>Amazon EFS</td><td>File (NFS)</td><td>Provisioned Throughput, EFS One Zone (less resilient)</td></tr>
+        <tr><td>Amazon FSx</td><td>Windows/Lustre</td><td>FSx for Lustre with S3 integration for HPC/ML</td></tr>
+    </table>
+    <div class="tip"><strong>💡 2026 Evolution:</strong> <em>gp3</em> is now the default mental model. If you need to tune performance without resizing the volume, gp3 is correct.</div>
+
+    <h3>🗂️ Database & Caching</h3>
+    <ul>
+        <li><span class="highlight">RDS</span> read replicas (up to 15 for Aurora), Multi‑AZ for HA.</li>
+        <li><span class="highlight">ElastiCache</span> (Redis vs Memcached) – Redis for persistence, replication, pub/sub.</li>
+        <li><span class="highlight">DynamoDB</span> – on‑demand vs provisioned, DAX for microsecond reads.</li>
+    </ul>
+
+    <!-- SECTION 4: COST-OPTIMIZED (20%) -->
+    <h2>💰 4. Design Cost‑Optimized Architectures (20%)</h2>
+    <ul>
+        <li><span class="highlight">EC2 pricing:</span> On‑Demand, Reserved (Standard/Convertible), Savings Plans, Spot Instances.</li>
+        <li><span class="highlight">S3 Storage Classes:</span> S3 Standard → Intelligent‑Tiering → Infrequent Access → Glacier → Deep Archive.</li>
+        <li><span class="highlight">AWS Budgets</span> & <span class="highlight">Cost Explorer</span> to track spend.</li>
+        <li><span class="highlight">Compute Optimizer</span> for right‑sizing recommendations.</li>
+        <li><span class="highlight">Trusted Advisor</span> cost optimization checks.</li>
+    </ul>
+
+    <!-- KEY SERVICE DEEP DIVE -->
+    <h2>📋 Key Service Cheat Sheet (SAA-C03 Essentials)</h2>
+    <table class="service-table">
+        <tr><th>Service</th><th>Primary Use</th><th>Exam Association</th></tr>
+        <tr><td>Amazon VPC</td><td>Isolated network</td><td>Security, Resilience</td></tr>
+        <tr><td>AWS IAM</td><td>Identity & access</td><td>Security (foundation)</td></tr>
+        <tr><td>Amazon S3</td><td>Object storage</td><td>All domains</td></tr>
+        <tr><td>Amazon EC2 + ASG</td><td>Compute scaling</td><td>High‑Performance, Resilience</td></tr>
+        <tr><td>Amazon RDS / Aurora</td><td>Relational DB</td><td>Resilience, Performance</td></tr>
+        <tr><td>Amazon DynamoDB</td><td>NoSQL key‑value</td><td>High‑Performance, Serverless</td></tr>
+        <tr><td>AWS Lambda</td><td>Serverless compute</td><td>Cost‑Optimized, Performance</td></tr>
+        <tr><td>Amazon CloudFront</td><td>CDN</td><td>High‑Performance, Security</td></tr>
+        <tr><td>AWS KMS</td><td>Encryption keys</td><td>Security</td></tr>
+        <tr><td>AWS Organizations</td><td>Multi‑account</td><td>Security (SCPs)</td></tr>
+    </table>
+
+    <h2>🧠 2026 Exam Mindset & Final Tips</h2>
+    <ul>
+        <li>✅ <strong>Always choose private connectivity</strong> when possible.</li>
+        <li>✅ <strong>Decouple applications</strong> with SQS, SNS, EventBridge.</li>
+        <li>✅ <strong>Use managed services</strong> to reduce operational overhead (Aurora, DynamoDB, Lambda).</li>
+        <li>✅ <strong>Read the question carefully</strong> – distractors are often technically correct but miss a key requirement.</li>
+    </ul>
+    <div class="faq">
+        <h3>📅 7‑Day Final Review Plan (before April 29)</h3>
+        <ul>
+            <li><strong>Day 1‑2:</strong> Re‑read Domain 1 (Security) & take 2 practice exams.</li>
+            <li><strong>Day 3‑4:</strong> Focus on Resilience & High‑Performance; review DR strategies.</li>
+            <li><strong>Day 5:</strong> Cost optimization and S3 storage classes.</li>
+            <li><strong>Day 6:</strong> Full‑length timed exam (use CBT bank below).</li>
+            <li><strong>Day 7:</strong> Rest, review cheat sheet, and relax.</li>
+        </ul>
+    </div>
+    <hr>
+    <p style="text-align:right"><em>Guide updated for 2026 SAA-C03 exam blueprint. You've got this! 🚀</em></p>
+</div>
+</body>
+</html>
