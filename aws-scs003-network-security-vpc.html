@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS SCS-C03 | Network Security – VPC</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Bebas+Neue&family=Source+Serif+4:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06080f;
+    --surface: #0c1018;
+    --surface2: #111520;
+    --border: #1c2333;
+    --border2: #253047;
+    --amber: #f5a623;
+    --amber-dim: rgba(245,166,35,0.12);
+    --amber-border: rgba(245,166,35,0.28);
+    --green: #3dd68c;
+    --green-dim: rgba(61,214,140,0.1);
+    --red: #ff5f5f;
+    --red-dim: rgba(255,95,95,0.1);
+    --blue: #4ca8f5;
+    --blue-dim: rgba(76,168,245,0.1);
+    --text: #d4dae8;
+    --text-dim: #7e8ea8;
+    --text-bright: #eef2fb;
+    --mono: 'IBM Plex Mono', monospace;
+    --display: 'Bebas Neue', sans-serif;
+    --body: 'Source Serif 4', serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  /* Blueprint dot grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(245,166,35,0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 28px 100px;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    padding: 64px 0 36px;
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--amber) 0%, transparent 70%);
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    background: var(--amber-dim);
+    border: 1px solid var(--amber-border);
+    padding: 5px 14px;
+    display: inline-block;
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(42px, 7vw, 72px);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: var(--text-bright);
+    margin-bottom: 8px;
+  }
+
+  h1 span { color: var(--amber); }
+
+  .subtitle {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── TOC ─── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-top: 2px solid var(--amber);
+    padding: 22px 26px;
+    margin-bottom: 52px;
+  }
+
+  .toc-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 14px;
+  }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 6px 20px;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .toc-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    min-width: 18px;
+  }
+
+  .toc-item a {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: color 0.2s;
+  }
+
+  .toc-item a:hover { color: var(--amber); }
+
+  /* ─── SECTIONS ─── */
+  section { margin-bottom: 72px; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 26px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--bg);
+    background: var(--amber);
+    padding: 3px 9px;
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-size: 28px;
+    letter-spacing: 0.06em;
+    color: var(--text-bright);
+  }
+
+  h3 {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 28px 0 14px;
+    padding-left: 12px;
+    border-left: 2px solid var(--amber);
+  }
+
+  p { color: var(--text-dim); margin-bottom: 16px; font-size: 14.5px; }
+
+  /* ─── TABLES ─── */
+  .table-wrap {
+    overflow-x: auto;
+    margin-bottom: 22px;
+    border: 1px solid var(--border2);
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+  thead { background: var(--surface2); }
+
+  th {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber);
+    padding: 11px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border2);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 10px 16px;
+    color: var(--text-dim);
+    border-bottom: 1px solid rgba(28,35,51,0.8);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(245,166,35,0.02); }
+  td strong { color: var(--text-bright); font-weight: 600; }
+
+  td code {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--amber-dim);
+    color: var(--amber);
+    padding: 2px 6px;
+  }
+
+  /* ─── PILLS ─── */
+  .pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 7px;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+
+  .pill-green { background: var(--green-dim); color: var(--green); }
+  .pill-red { background: var(--red-dim); color: var(--red); }
+  .pill-amber { background: var(--amber-dim); color: var(--amber); }
+  .pill-blue { background: var(--blue-dim); color: var(--blue); }
+
+  /* ─── CALLOUTS ─── */
+  .callout {
+    display: flex;
+    gap: 14px;
+    padding: 15px 18px;
+    margin: 18px 0;
+    font-size: 13.5px;
+    border-left: 3px solid;
+  }
+
+  .callout-tip {
+    background: var(--amber-dim);
+    border-color: var(--amber);
+  }
+
+  .callout-danger {
+    background: var(--red-dim);
+    border-color: var(--red);
+  }
+
+  .callout-info {
+    background: var(--blue-dim);
+    border-color: var(--blue);
+  }
+
+  .callout-icon { font-size: 15px; flex-shrink: 0; line-height: 1.6; }
+
+  .callout-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .callout-tip .callout-label { color: var(--amber); }
+  .callout-danger .callout-label { color: var(--red); }
+  .callout-info .callout-label { color: var(--blue); }
+  .callout p { color: var(--text-dim); margin: 0; font-size: 13.5px; line-height: 1.6; }
+
+  /* ─── VS SPLIT ─── */
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--border2);
+    margin-bottom: 22px;
+  }
+
+  .split-col {
+    padding: 22px;
+    background: var(--surface);
+  }
+
+  .split-col:first-child {
+    border-right: 1px solid var(--border2);
+  }
+
+  .split-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sg-title { color: var(--green); border-color: rgba(61,214,140,0.2); }
+  .nacl-title { color: var(--blue); border-color: rgba(76,168,245,0.2); }
+  .gw-title { color: var(--amber); border-color: var(--amber-border); }
+  .iface-title { color: var(--green); border-color: rgba(61,214,140,0.2); }
+  .std-title { color: var(--text-dim); }
+  .adv-title { color: var(--amber); }
+
+  .split-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .split-list li {
+    font-size: 13px;
+    color: var(--text-dim);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .split-list li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--text-dim);
+    font-size: 14px;
+    top: -1px;
+  }
+
+  .split-list li strong { color: var(--text-bright); }
+
+  /* ─── ARCHITECTURE DIAGRAM ─── */
+  .arch-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .arch-diagram::before {
+    content: 'ARCHITECTURE';
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--border2);
+  }
+
+  .arch-layer {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
+    margin-bottom: 2px;
+    position: relative;
+  }
+
+  .arch-layer::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    bottom: -2px;
+    width: 2px;
+    height: 4px;
+    background: var(--border2);
+  }
+
+  .arch-layer:last-child::before { display: none; }
+
+  .arch-box {
+    flex: 1;
+    border: 1px solid;
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .arch-label {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+    opacity: 0.7;
+  }
+
+  .arch-name { font-size: 13px; font-weight: 600; }
+  .arch-note { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+
+  .layer-internet { border-color: rgba(255,95,95,0.4); background: rgba(255,95,95,0.04); }
+  .layer-internet .arch-label { color: var(--red); }
+  .layer-internet .arch-name { color: var(--red); }
+
+  .layer-edge { border-color: var(--amber-border); background: var(--amber-dim); }
+  .layer-edge .arch-label { color: var(--amber); }
+  .layer-edge .arch-name { color: var(--amber); }
+
+  .layer-waf { border-color: rgba(245,166,35,0.5); background: rgba(245,166,35,0.06); }
+  .layer-waf .arch-label { color: var(--amber); }
+  .layer-waf .arch-name { color: var(--text-bright); }
+
+  .layer-fw { border-color: rgba(76,168,245,0.35); background: var(--blue-dim); }
+  .layer-fw .arch-label { color: var(--blue); }
+  .layer-fw .arch-name { color: var(--blue); }
+
+  .layer-sg { border-color: rgba(61,214,140,0.35); background: var(--green-dim); }
+  .layer-sg .arch-label { color: var(--green); }
+  .layer-sg .arch-name { color: var(--green); }
+
+  .layer-ep { border-color: var(--border2); background: var(--surface2); }
+  .layer-ep .arch-label { color: var(--text-dim); }
+  .layer-ep .arch-name { color: var(--text-dim); }
+
+  .arch-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    min-width: 50px;
+  }
+
+  .arch-arrow-inner {
+    width: 2px;
+    height: 28px;
+    background: var(--border2);
+    position: relative;
+    margin: 0 auto;
+  }
+
+  .arch-arrow-inner::after {
+    content: '▼';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--border2);
+  }
+
+  /* ─── CODE / PRE ─── */
+  pre {
+    background: #030508;
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--amber);
+    padding: 18px 22px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.9;
+    color: #8faac8;
+    margin: 18px 0;
+  }
+
+  pre .kw { color: var(--amber); }
+  pre .val { color: var(--green); }
+  pre .cm { color: var(--text-dim); }
+
+  /* ─── QUICK FACTS ─── */
+  .facts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 10px;
+  }
+
+  .fact {
+    display: flex;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 13px 16px;
+    align-items: flex-start;
+  }
+
+  .fact-n {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--amber);
+    min-width: 22px;
+    margin-top: 3px;
+    opacity: 0.8;
+  }
+
+  .fact-t {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.55;
+  }
+
+  .fact-t strong { color: var(--amber); }
+
+  /* ─── NACL RULE TABLE (colored rows) ─── */
+  .rule-allow td { color: #8bc8a0; }
+  .rule-deny td { color: #c87a7a; }
+  .rule-implicit td { color: var(--text-dim); font-style: italic; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--amber); }
+
+  @media (max-width: 640px) {
+    .split { grid-template-columns: 1fr; }
+    .split-col:first-child { border-right: none; border-bottom: 1px solid var(--border2); }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="badge">// AWS SCS-C03 · Module 02</div>
+    <h1>Network Security<br><span>VPC</span></h1>
+    <p class="subtitle">SG · NACL · VPC ENDPOINTS · NETWORK FIREWALL · WAF · SHIELD</p>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <div class="toc-label">// Index</div>
+    <div class="toc-grid">
+      <div class="toc-item"><span class="toc-num">01</span><a href="#sg-nacl">SG vs NACL</a></div>
+      <div class="toc-item"><span class="toc-num">02</span><a href="#stateful">Stateful vs Stateless</a></div>
+      <div class="toc-item"><span class="toc-num">03</span><a href="#nacl-rules">NACL Rule Order</a></div>
+      <div class="toc-item"><span class="toc-num">04</span><a href="#endpoints">VPC Endpoints</a></div>
+      <div class="toc-item"><span class="toc-num">05</span><a href="#gateway">Gateway Endpoints</a></div>
+      <div class="toc-item"><span class="toc-num">06</span><a href="#interface">Interface Endpoints</a></div>
+      <div class="toc-item"><span class="toc-num">07</span><a href="#firewall">Network Firewall</a></div>
+      <div class="toc-item"><span class="toc-num">08</span><a href="#waf">AWS WAF</a></div>
+      <div class="toc-item"><span class="toc-num">09</span><a href="#shield">AWS Shield</a></div>
+      <div class="toc-item"><span class="toc-num">10</span><a href="#arch">Defense-in-Depth</a></div>
+      <div class="toc-item"><span class="toc-num">11</span><a href="#facts">Exam Quick Facts</a></div>
+    </div>
+  </nav>
+
+  <!-- 1. SG vs NACL -->
+  <section id="sg-nacl">
+    <div class="section-header">
+      <div class="section-tag">01</div>
+      <h2>Security Groups vs Network ACLs</h2>
+    </div>
+
+    <div class="split">
+      <div class="split-col">
+        <div class="split-title sg-title">🛡 Security Groups</div>
+        <ul class="split-list">
+          <li><strong>Stateful</strong> — return traffic auto-allowed</li>
+          <li>Attached to <strong>EC2 instances / ENIs</strong></li>
+          <li><strong>Allow rules only</strong> — cannot explicitly deny</li>
+          <li>All rules evaluated simultaneously</li>
+          <li>Multiple SGs per instance allowed</li>
+          <li>Supports <strong>self-referencing</strong> (allow same-SG traffic)</li>
+          <li>Default: no inbound, all outbound allowed</li>
+        </ul>
+      </div>
+      <div class="split-col">
+        <div class="split-title nacl-title">🧱 Network ACLs</div>
+        <ul class="split-list">
+          <li><strong>Stateless</strong> — must allow both directions explicitly</li>
+          <li>Applied at <strong>subnet level</strong></li>
+          <li><strong>Allow AND Deny</strong> rules supported</li>
+          <li>Rules processed in <strong>ascending number order</strong></li>
+          <li>One NACL per subnet; one subnet per NACL</li>
+          <li>Must allow <strong>ephemeral ports 1024–65535</strong> outbound</li>
+          <li>Default (new VPC): all traffic allowed</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>Security Group</th><th>Network ACL</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>State</strong></td><td><span class="pill pill-green">Stateful</span></td><td><span class="pill pill-blue">Stateless</span></td></tr>
+          <tr><td><strong>Scope</strong></td><td>Instance / ENI</td><td>Subnet</td></tr>
+          <tr><td><strong>Rule types</strong></td><td>Allow only</td><td>Allow + Deny</td></tr>
+          <tr><td><strong>Rule evaluation</strong></td><td>All at once</td><td>Lowest number first</td></tr>
+          <tr><td><strong>Explicit IP block?</strong></td><td><span class="pill pill-red">❌ No</span></td><td><span class="pill pill-green">✅ Yes</span></td></tr>
+          <tr><td><strong>Ephemeral ports needed?</strong></td><td><span class="pill pill-green">Auto</span></td><td><span class="pill pill-red">Manual required</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 2. Stateful vs Stateless -->
+  <section id="stateful">
+    <div class="section-header">
+      <div class="section-tag">02</div>
+      <h2>Stateful vs Stateless Explained</h2>
+    </div>
+
+    <div class="split">
+      <div class="split-col">
+        <div class="split-title sg-title">Stateful — Security Groups</div>
+        <p style="font-size:13px; margin-bottom:10px;">Allow inbound port 443 → response traffic is <strong>automatically allowed</strong> outbound. No outbound rule needed for replies.</p>
+        <pre style="margin:0; font-size:11px;"><span class="kw">Inbound:</span>  <span class="val">ALLOW TCP 443 0.0.0.0/0</span>
+<span class="kw">Outbound:</span> <span class="cm">(no rule needed — auto-tracked)</span></pre>
+      </div>
+      <div class="split-col">
+        <div class="split-title nacl-title">Stateless — NACLs</div>
+        <p style="font-size:13px; margin-bottom:10px;">Each packet evaluated independently. Must <strong>explicitly allow both</strong> the request AND the response ephemeral ports.</p>
+        <pre style="margin:0; font-size:11px;"><span class="kw">Inbound:</span>  <span class="val">ALLOW TCP 443</span>
+<span class="kw">Outbound:</span> <span class="val">ALLOW TCP 1024-65535</span> <span class="cm">← required!</span></pre>
+      </div>
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-icon">🚨</div>
+      <div>
+        <span class="callout-label">Exam Trap</span>
+        <p>Forgetting to add an outbound NACL rule for <strong>ephemeral ports (1024–65535)</strong> is the #1 NACL exam mistake. HTTP/S responses flow back on these dynamic ports — without an outbound allow rule, all responses are silently dropped.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. NACL Rules -->
+  <section id="nacl-rules">
+    <div class="section-header">
+      <div class="section-tag">03</div>
+      <h2>NACL Rule Evaluation Order</h2>
+    </div>
+
+    <p>Rules are evaluated in <strong>ascending numerical order</strong>. First match wins — processing stops immediately.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Rule #</th><th>Type</th><th>Protocol</th><th>Port</th><th>Source</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr class="rule-allow"><td><strong>90</strong></td><td>Custom TCP</td><td>TCP</td><td>22</td><td>10.0.0.0/8</td><td><span class="pill pill-green">ALLOW</span></td></tr>
+          <tr class="rule-deny"><td><strong>95</strong></td><td>Custom TCP</td><td>TCP</td><td>22</td><td>203.0.113.0/24</td><td><span class="pill pill-red">DENY</span></td></tr>
+          <tr class="rule-allow"><td><strong>100</strong></td><td>HTTP</td><td>TCP</td><td>80</td><td>0.0.0.0/0</td><td><span class="pill pill-green">ALLOW</span></td></tr>
+          <tr class="rule-allow"><td><strong>200</strong></td><td>HTTPS</td><td>TCP</td><td>443</td><td>0.0.0.0/0</td><td><span class="pill pill-green">ALLOW</span></td></tr>
+          <tr class="rule-implicit"><td><strong>*</strong></td><td>All Traffic</td><td>All</td><td>All</td><td>0.0.0.0/0</td><td><span class="pill pill-red">DENY</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">💡</div>
+      <div>
+        <span class="callout-label">Exam Tip</span>
+        <p>To block a specific IP, place a <strong>DENY rule with a lower number</strong> than the corresponding ALLOW rule. In the table above, rule 95 blocks an SSH attacker before rule 100+ can allow them. Security Groups cannot do this — only NACLs support explicit DENY.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. VPC Endpoints -->
+  <section id="endpoints">
+    <div class="section-header">
+      <div class="section-tag">04</div>
+      <h2>VPC Endpoints</h2>
+    </div>
+    <p>VPC Endpoints allow your resources to reach AWS services privately — <strong>no internet gateway, NAT device, VPN, or Direct Connect needed</strong>. Traffic stays on the AWS backbone, never touching the public internet.</p>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">🔒</div>
+      <div>
+        <span class="callout-label">Security Benefit</span>
+        <p>Endpoints eliminate the attack surface from NAT Gateways and internet-facing routes. Combined with endpoint policies, you can restrict which resources in your VPC can access which AWS service resources.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Gateway Endpoints -->
+  <section id="gateway">
+    <div class="section-header">
+      <div class="section-tag">05</div>
+      <h2>Gateway Endpoints</h2>
+    </div>
+
+    <div class="split">
+      <div class="split-col">
+        <div class="split-title gw-title">Gateway Endpoint</div>
+        <ul class="split-list">
+          <li>Services: <strong>S3 and DynamoDB only</strong></li>
+          <li>Implemented via <strong>route table entry</strong></li>
+          <li>Cost: <strong>Free</strong></li>
+          <li>Region-scoped (not AZ-specific)</li>
+          <li>High availability built-in</li>
+          <li>Secured with Endpoint Policies</li>
+          <li><strong>No DNS change</strong> required</li>
+          <li>❌ Not accessible from on-premises</li>
+        </ul>
+      </div>
+      <div class="split-col">
+        <div class="split-title" style="color:var(--text-dim)">Example: S3 Gateway Endpoint Policy</div>
+        <pre style="margin:0; font-size:11px; background: #030508; border:none; padding: 14px;">{
+  <span class="kw">"Effect"</span>: <span class="val">"Allow"</span>,
+  <span class="kw">"Principal"</span>: <span class="val">"*"</span>,
+  <span class="kw">"Action"</span>: <span class="val">"s3:GetObject"</span>,
+  <span class="kw">"Resource"</span>: <span class="val">"arn:aws:s3:::bucket/*"</span>
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Interface Endpoints -->
+  <section id="interface">
+    <div class="section-header">
+      <div class="section-tag">06</div>
+      <h2>Interface Endpoints (PrivateLink)</h2>
+    </div>
+
+    <div class="split">
+      <div class="split-col">
+        <div class="split-title iface-title">Interface Endpoint</div>
+        <ul class="split-list">
+          <li>Services: <strong>All other AWS services</strong> (KMS, SSM, SNS, SQS, EC2 API…)</li>
+          <li>Creates an <strong>ENI with private IP</strong> in your subnet</li>
+          <li>Cost: Hourly + data processing</li>
+          <li>AZ-specific — deploy per-AZ for HA</li>
+          <li>Secured with <strong>Security Groups + Endpoint Policies</strong></li>
+          <li>Private DNS enabled by default</li>
+          <li>✅ Accessible <strong>from on-premises</strong> via VPN/DX</li>
+        </ul>
+      </div>
+      <div class="split-col">
+        <div class="split-title" style="color:var(--text-dim)">Gateway vs Interface</div>
+        <div class="table-wrap" style="margin:0; border:none;">
+          <table>
+            <thead><tr><th>Feature</th><th>Gateway</th><th>Interface</th></tr></thead>
+            <tbody>
+              <tr><td>Services</td><td>S3, DynamoDB</td><td>Everything else</td></tr>
+              <tr><td>Mechanism</td><td>Route table</td><td>ENI</td></tr>
+              <tr><td>Cost</td><td><span class="pill pill-green">Free</span></td><td><span class="pill pill-amber">Paid</span></td></tr>
+              <tr><td>HA</td><td>Automatic</td><td>Manual (per-AZ)</td></tr>
+              <tr><td>On-premises</td><td><span class="pill pill-red">❌</span></td><td><span class="pill pill-green">✅</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">💡</div>
+      <div>
+        <span class="callout-label">Exam Tip</span>
+        <p>If the scenario involves <strong>on-premises servers accessing an AWS service privately</strong> via Direct Connect or VPN → it must be an <strong>Interface Endpoint</strong>. Gateway Endpoints are not reachable outside the VPC.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Network Firewall -->
+  <section id="firewall">
+    <div class="section-header">
+      <div class="section-tag">07</div>
+      <h2>AWS Network Firewall</h2>
+    </div>
+    <p>A managed stateful/stateless network firewall for VPC-level protection. Inspects and filters traffic at Layers 3, 4, and some Layer 7 (domain filtering).</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>Detail</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Placement</strong></td><td>Dedicated firewall subnet in each AZ</td></tr>
+          <tr><td><strong>Rule types</strong></td><td>Stateless (fast), Stateful (connection-aware), Domain lists, Suricata IPS</td></tr>
+          <tr><td><strong>Protocols</strong></td><td>Any TCP/UDP — not limited to HTTP</td></tr>
+          <tr><td><strong>Multi-account</strong></td><td>Managed centrally via AWS Firewall Manager</td></tr>
+          <tr><td><strong>Logging</strong></td><td>S3, CloudWatch Logs, Kinesis Firehose</td></tr>
+          <tr><td><strong>Use cases</strong></td><td>Outbound domain filtering, C2 callback blocking, east-west IDS/IPS</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 8. WAF -->
+  <section id="waf">
+    <div class="section-header">
+      <div class="section-tag">08</div>
+      <h2>AWS WAF</h2>
+    </div>
+    <p>Layer 7 Web Application Firewall. Inspects HTTP/HTTPS traffic for application-layer attacks.</p>
+
+    <div class="split">
+      <div class="split-col">
+        <div class="split-title gw-title">Supported Resources</div>
+        <ul class="split-list">
+          <li>Amazon CloudFront distributions</li>
+          <li>Application Load Balancers (ALB)</li>
+          <li>API Gateway (REST &amp; HTTP APIs)</li>
+          <li>AWS AppSync (GraphQL)</li>
+          <li>Amazon Cognito user pools</li>
+        </ul>
+      </div>
+      <div class="split-col">
+        <div class="split-title iface-title">Common WAF Rules</div>
+        <ul class="split-list">
+          <li>AWS Managed Rules (OWASP Top 10)</li>
+          <li>Rate-based — block IPs exceeding X req/5min</li>
+          <li>Geographic match — block by country</li>
+          <li>SQL injection &amp; XSS detection</li>
+          <li>IP allow/block sets</li>
+          <li>Custom regex pattern matching</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">💡</div>
+      <div>
+        <span class="callout-label">Network Firewall vs WAF</span>
+        <p><strong>WAF</strong> = Layer 7 HTTP/HTTPS web app protection (SQL injection, XSS, bot, rate limiting). <strong>Network Firewall</strong> = Layer 3/4 VPC traffic (any protocol, IDS/IPS, domain filtering, east-west). They complement each other — use both in a full defense-in-depth stack.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Shield -->
+  <section id="shield">
+    <div class="section-header">
+      <div class="section-tag">09</div>
+      <h2>AWS Shield</h2>
+    </div>
+
+    <div class="split">
+      <div class="split-col">
+        <div class="split-title std-title">Shield Standard</div>
+        <ul class="split-list">
+          <li><strong>Free, automatic</strong> — no action required</li>
+          <li>Enabled for all AWS accounts</li>
+          <li>Protects against common <strong>L3/L4 DDoS</strong>: SYN floods, UDP reflection, DNS amplification</li>
+          <li>Integrated with CloudFront and Route 53</li>
+          <li>No visibility into attacks</li>
+          <li>No DRT access</li>
+        </ul>
+      </div>
+      <div class="split-col">
+        <div class="split-title adv-title">Shield Advanced</div>
+        <ul class="split-list">
+          <li><strong>$3,000/month</strong> per organization</li>
+          <li>Protects: EC2 EIPs, ELB, CloudFront, Global Accelerator, Route 53</li>
+          <li><strong>DRT</strong> — 24/7 AWS DDoS Response Team access</li>
+          <li><strong>Cost protection</strong> — AWS credits for scaling costs during attacks</li>
+          <li>Near real-time attack visibility + event summaries</li>
+          <li>Automatic WAF rule creation during L7 attacks</li>
+          <li>Health-based detection using Route 53</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>Standard</th><th>Advanced</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Cost</strong></td><td><span class="pill pill-green">Free</span></td><td><span class="pill pill-amber">$3,000/mo</span></td></tr>
+          <tr><td><strong>L3/L4 protection</strong></td><td><span class="pill pill-green">Basic</span></td><td><span class="pill pill-green">Enhanced</span></td></tr>
+          <tr><td><strong>L7 protection</strong></td><td><span class="pill pill-red">❌</span></td><td><span class="pill pill-green">✅ With WAF</span></td></tr>
+          <tr><td><strong>DRT access</strong></td><td><span class="pill pill-red">❌</span></td><td><span class="pill pill-green">✅ 24/7</span></td></tr>
+          <tr><td><strong>Cost protection</strong></td><td><span class="pill pill-red">❌</span></td><td><span class="pill pill-green">✅</span></td></tr>
+          <tr><td><strong>Real-time metrics</strong></td><td><span class="pill pill-red">❌</span></td><td><span class="pill pill-green">✅</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">🎯</div>
+      <div>
+        <span class="callout-label">Exam Trigger Words → Shield Advanced</span>
+        <p>"DDoS response team" · "DRT" · "cost protection from DDoS scaling" · "advanced attack visibility" · "automatic WAF rules during attacks" · "health-based detection"</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. Architecture -->
+  <section id="arch">
+    <div class="section-header">
+      <div class="section-tag">10</div>
+      <h2>Defense-in-Depth Architecture</h2>
+    </div>
+
+    <div class="arch-diagram">
+      <div class="arch-layer">
+        <div class="arch-box layer-internet">
+          <div class="arch-label">Threat Origin</div>
+          <div class="arch-name">Public Internet</div>
+        </div>
+      </div>
+      <div style="text-align:center; padding: 4px 0; font-family: var(--mono); font-size:11px; color: var(--border2);">▼</div>
+      <div class="arch-layer">
+        <div class="arch-box layer-edge">
+          <div class="arch-label">Layer 3/4 · Automatic</div>
+          <div class="arch-name">Route 53 + CloudFront + Shield Standard</div>
+          <div class="arch-note">SYN floods, UDP reflection, DNS amplification — blocked automatically</div>
+        </div>
+      </div>
+      <div style="text-align:center; padding: 4px 0; font-family: var(--mono); font-size:11px; color: var(--border2);">▼</div>
+      <div class="arch-layer">
+        <div class="arch-box layer-waf">
+          <div class="arch-label">Layer 7 · Application</div>
+          <div class="arch-name">CloudFront + WAF WebACL + Shield Advanced</div>
+          <div class="arch-note">SQL injection, XSS, geo-blocking, rate limiting, OWASP Top 10</div>
+        </div>
+      </div>
+      <div style="text-align:center; padding: 4px 0; font-family: var(--mono); font-size:11px; color: var(--border2);">▼</div>
+      <div class="arch-layer">
+        <div class="arch-box layer-fw">
+          <div class="arch-label">Layer 3/4/7 · VPC</div>
+          <div class="arch-name">AWS Network Firewall (dedicated subnet)</div>
+          <div class="arch-note">Stateful IDS/IPS, domain filtering, east-west traffic inspection, Suricata rules</div>
+        </div>
+      </div>
+      <div style="text-align:center; padding: 4px 0; font-family: var(--mono); font-size:11px; color: var(--border2);">▼</div>
+      <div class="arch-layer">
+        <div class="arch-box layer-sg">
+          <div class="arch-label">Instance Level</div>
+          <div class="arch-name">ALB Security Group → EC2 Security Groups + NACL</div>
+          <div class="arch-note">Port-level allow rules (SG) + subnet-level deny rules (NACL)</div>
+        </div>
+      </div>
+      <div style="text-align:center; padding: 4px 0; font-family: var(--mono); font-size:11px; color: var(--border2);">▼</div>
+      <div class="arch-layer">
+        <div class="arch-box layer-ep">
+          <div class="arch-label">Private AWS Access</div>
+          <div class="arch-name">S3 via Gateway Endpoint · KMS/SSM via Interface Endpoint</div>
+          <div class="arch-note">Traffic never leaves AWS backbone — no NAT, no internet exposure</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. Quick Facts -->
+  <section id="facts">
+    <div class="section-header">
+      <div class="section-tag">11</div>
+      <h2>Exam Quick Facts</h2>
+    </div>
+    <div class="facts-grid">
+      <div class="fact"><span class="fact-n">01</span><span class="fact-t">Security Groups are <strong>stateful</strong> — return traffic automatically allowed</span></div>
+      <div class="fact"><span class="fact-n">02</span><span class="fact-t">NACLs are <strong>stateless</strong> — must explicitly allow both inbound AND outbound (ephemeral 1024–65535)</span></div>
+      <div class="fact"><span class="fact-n">03</span><span class="fact-t">NACL rules evaluated in <strong>ascending order</strong> — first match wins</span></div>
+      <div class="fact"><span class="fact-n">04</span><span class="fact-t">To <strong>block a specific IP</strong> → NACL DENY rule (SGs cannot deny, only allow)</span></div>
+      <div class="fact"><span class="fact-n">05</span><span class="fact-t">Gateway Endpoints: <strong>S3 &amp; DynamoDB only</strong> — free, route-table based</span></div>
+      <div class="fact"><span class="fact-n">06</span><span class="fact-t">Interface Endpoints: all other services — paid, ENI-based, supports on-premises access</span></div>
+      <div class="fact"><span class="fact-n">07</span><span class="fact-t"><strong>On-premises → AWS service privately</strong> = Interface Endpoint (not Gateway)</span></div>
+      <div class="fact"><span class="fact-n">08</span><span class="fact-t">WAF operates at <strong>Layer 7</strong> (HTTP/HTTPS) — attach to CloudFront, ALB, API GW</span></div>
+      <div class="fact"><span class="fact-n">09</span><span class="fact-t">Network Firewall at <strong>Layer 3/4</strong> inside VPC — supports Suricata IPS rules, domain lists</span></div>
+      <div class="fact"><span class="fact-n">10</span><span class="fact-t">Shield Standard is <strong>free and automatic</strong> for every AWS account — no configuration needed</span></div>
+      <div class="fact"><span class="fact-n">11</span><span class="fact-t">Shield Advanced: <strong>$3,000/month</strong> — DRT, cost protection, L7 via WAF, health-based detection</span></div>
+      <div class="fact"><span class="fact-n">12</span><span class="fact-t">Shield Advanced + WAF together = protection against both <strong>L3/4 and L7 DDoS</strong></span></div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
